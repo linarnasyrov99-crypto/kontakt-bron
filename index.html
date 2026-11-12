@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Бронь кабинетов · ЦПП «Контакт»</title>
+<meta name="description" content="Свободные кабинеты ЦПП «Контакт» и бронь в два касания">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f3ee; --card:#fffdf9; --ink:#1f2a27; --muted:#6c7774; --line:#e6e0d6;
+  --free:#e3f1ea; --free-ink:#1d6b4f; --busy:#ece8e1; --busy-ink:#a9a39a;
+  --sel:#1d6b4f; --sel-ink:#fff; --accent:#c96f4a; --past:#f1eee8;
+  --shadow:0 8px 30px rgba(31,42,39,.10);
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#141a19; --card:#1c2422; --ink:#eef2f0; --muted:#94a19d; --line:#2b3532;
+  --free:#1d3a30; --free-ink:#8fdcb9; --busy:#232b29; --busy-ink:#55615d;
+  --sel:#8fdcb9; --sel-ink:#10201a; --accent:#e89a78; --past:#181f1d; --shadow:0 8px 30px rgba(0,0,0,.4);
+}}
+*{box-sizing:border-box} html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,sans-serif;font-size:15px;line-height:1.4;padding-bottom:140px}
+.wrap{max-width:980px;margin:0 auto;padding:0 16px}
+header{padding:22px 0 8px}
+.brand{font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.02em}
+h1{font-size:26px;margin:4px 0 2px;font-weight:800;letter-spacing:-.02em}
+.upd{font-size:12px;color:var(--muted)}
+.proto{display:inline-block;font-size:11px;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:99px;padding:1px 8px;margin-left:6px;vertical-align:2px}
+.tabs{display:flex;gap:6px;margin:16px 0 12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:4px;width:max-content}
+.tab{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:700;padding:8px 14px;border-radius:10px;cursor:pointer}
+.tab.on{background:var(--ink);color:var(--bg)}
+.days{display:flex;gap:6px;overflow-x:auto;padding:2px 0 10px;scrollbar-width:none}
+.days::-webkit-scrollbar{display:none}
+.day{flex:0 0 auto;width:58px;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:7px 0;text-align:center;cursor:pointer;color:var(--ink);font:inherit}
+.day b{display:block;font-size:18px} .day small{font-size:11px;color:var(--muted);text-transform:uppercase;font-weight:700}
+.day i{display:block;font-style:normal;font-size:10px;color:var(--free-ink);font-weight:700;margin-top:2px}
+.day.we small{color:var(--accent)}
+.day.on{background:var(--ink);color:var(--bg);border-color:var(--ink)} .day.on small,.day.on i{color:var(--bg)}
+.day.past{opacity:.4}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:var(--shadow)}
+.dayhead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+.dayhead h2{margin:0;font-size:18px}
+.admin{font-size:13px;color:var(--muted)}
+.gridwrap{overflow-x:auto;margin:0 -14px;padding:0 14px}
+table{border-collapse:separate;border-spacing:4px;min-width:640px;width:100%}
+th{font-size:12px;color:var(--muted);font-weight:700;padding:2px 0}
+th.room{min-width:62px}
+td.h{position:sticky;left:-14px;background:var(--card);z-index:1;font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap;padding-right:4px;text-align:right}
+td.c{height:34px;border-radius:9px;text-align:center;font-size:11px;font-weight:700;cursor:pointer;user-select:none;transition:transform .08s}
+td.c.free{background:var(--free);color:var(--free-ink)}
+td.c.free:hover{outline:2px solid var(--free-ink)}
+td.c.busy{background:var(--busy);color:var(--busy-ink);cursor:not-allowed;background-image:repeating-linear-gradient(135deg,transparent 0 6px,rgba(127,127,127,.08) 6px 12px)}
+td.c.half{background:linear-gradient(180deg,var(--busy) 50%,var(--free) 50%);color:var(--free-ink)}
+td.c.halfb{background:linear-gradient(180deg,var(--free) 50%,var(--busy) 50%);color:var(--free-ink)}
+td.c.sel{background:var(--sel)!important;color:var(--sel-ink)!important;transform:scale(.96)}
+td.c.past{background:var(--past);color:transparent;cursor:default;background-image:none}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:10px}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:5px;vertical-align:-2px;background:var(--c)}
+.hint{font-size:13px;color:var(--muted);margin:2px 0 10px}
+/* поиск */
+.form{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+label{font-size:12px;color:var(--muted);font-weight:700;display:block;margin-bottom:4px}
+select,input{width:100%;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 10px}
+.res{display:grid;gap:8px}
+.slot{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid var(--line);border-radius:14px;padding:10px 12px;background:var(--bg)}
+.slot b{font-size:15px} .slot .m{font-size:12px;color:var(--muted)}
+.btn{border:0;font:inherit;font-weight:800;border-radius:12px;padding:10px 14px;cursor:pointer;background:var(--ink);color:var(--bg);white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:6px}
+.btn.alt{background:transparent;color:var(--ink);border:1px solid var(--line)}
+.btn.sm{padding:7px 11px;font-size:13px}
+/* панель брони */
+.bar{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));transform:translateY(110%);transition:transform .2s}
+.bar.on{transform:none}
+.bar .in{max-width:980px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:12px 14px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.bar .what{flex:1 1 240px} .bar .what b{display:block;font-size:16px} .bar .what span{font-size:13px;color:var(--muted)}
+.bar .acts{display:flex;gap:8px;flex-wrap:wrap}
+dialog{border:0;border-radius:20px;padding:0;max-width:440px;width:calc(100% - 32px);background:var(--card);color:var(--ink);box-shadow:var(--shadow)}
+dialog::backdrop{background:rgba(0,0,0,.35)}
+.dlg{padding:18px} .dlg h3{margin:0 0 4px} .dlg p{margin:0 0 12px;color:var(--muted);font-size:13px}
+textarea{width:100%;min-height:120px;font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px;resize:vertical}
+.row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.toast{position:fixed;left:50%;top:16px;transform:translate(-50%,-80px);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:99px;font-weight:700;font-size:14px;transition:transform .2s;z-index:9}
+.toast.on{transform:translate(-50%,0)}
+.empty{color:var(--muted);font-size:14px;padding:12px 0}
+footer{color:var(--muted);font-size:12px;margin:22px 0}
+@media (max-width:640px){
+  h1{font-size:22px} .form{grid-template-columns:1fr 1fr}
+  .tabs{width:100%} .tab{flex:1}
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="wrap">
+  <header>
+    <div class="brand">ЦПП «Контакт» · Уфа</div>
+    <h1>Бронь кабинетов <span class="proto">прототип</span></h1>
+    <div class="upd" id="upd"></div>
+  </header>
+
+  <div class="tabs">
+    <button class="tab on" data-v="day">По дням</button>
+    <button class="tab" data-v="find">Найти окно</button>
+  </div>
+
+  <section id="v-day">
+    <div class="days" id="days"></div>
+    <div class="card">
+      <div class="dayhead"><h2 id="dtitle"></h2><div class="admin" id="dadmin"></div></div>
+      <div class="hint">Нажми на свободные часы подряд в одном кабинете — внизу появится бронь.</div>
+      <div class="gridwrap"><table id="grid"></table></div>
+      <div class="legend">
+        <span style="--c:var(--free)">свободно</span>
+        <span style="--c:var(--busy)">занято</span>
+        <span style="--c:linear-gradient(180deg,var(--busy) 50%,var(--free) 50%)">свободно с :30</span>
+        <span style="--c:var(--sel)">выбрано</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="v-find" hidden>
+    <div class="card">
+      <div class="form">
+        <div><label>День</label><select id="fDay"></select></div>
+        <div><label>Начало не раньше</label><select id="fFrom"></select></div>
+        <div><label>Закончить до</label><select id="fTo"></select></div>
+        <div><label>Сколько часов</label><select id="fLen"><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+        <div><label>Кабинет</label><select id="fRoom"></select></div>
+        <div><label>Дни недели</label><select id="fWd"><option value="all">любые</option><option value="wk">только будни</option><option value="we">только выходные</option></select></div>
+      </div>
+      <div class="res" id="res"></div>
+    </div>
+  </section>
+
+  <footer>
+    Данные берутся из общей таблицы аренды. На сайте видно только «занято / свободно», фамилии не показываются.
+    Цены: будни 9–15 — 250 ₽, 16–19 — 350 ₽, 20–21 — 300 ₽; выходные и праздники — 300 ₽ за 55 минут. Учебные тройки — 250 ₽ в час.
+  </footer>
+</div>
+
+<div class="bar" id="bar"><div class="in">
+  <div class="what"><b id="bWhat"></b><span id="bMeta"></span></div>
+  <div class="acts"><button class="btn alt sm" id="bClear">Сбросить</button><button class="btn" id="bBook">Забронировать</button></div>
+</div></div>
+
+<dialog id="dlg"><div class="dlg">
+  <h3>Сообщение администратору</h3>
+  <p id="dlgTo"></p>
+  <label for="myName">Как тебя подписать</label>
+  <input id="myName" placeholder="Имя Фамилия">
+  <div style="height:10px"></div>
+  <textarea id="msg"></textarea>
+  <div class="row">
+    <button class="btn" id="dCopy">Скопировать</button>
+    <a class="btn alt" id="dTg" target="_blank" rel="noopener">Telegram</a>
+    <a class="btn alt" id="dWa" target="_blank" rel="noopener">WhatsApp</a>
+    <button class="btn alt" id="dClose">Закрыть</button>
+  </div>
+</div></dialog>
+
+<script>
+/* Администраторы по дням недели. Заполнить, когда ЦПП даст график:
+   имя и ник в Telegram (без @) или телефон для WhatsApp (79…). */
+const ADMINS = {
+  "пн": {name:"администратор понедельника", tg:"", wa:""},
+  "вт": {name:"администратор вторника",     tg:"", wa:""},
+  "ср": {name:"администратор среды",        tg:"", wa:""},
+  "чт": {name:"администратор четверга",     tg:"", wa:""},
+  "пт": {name:"администратор пятницы",      tg:"", wa:""},
+  "сб": {name:"администратор субботы",      tg:"", wa:""},
+  "вс": {name:"администратор воскресенья",  tg:"", wa:""},
+};
+const HOLIDAYS = ["2026-11-04"];
+const MONTHS = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+
+let DATA, cur, sel = null; // sel = {date, room, hours:[...]}
+const $ = s => document.querySelector(s);
+const store = {get(k){try{return localStorage.getItem(k)}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+
+const todayISO = (() => { const d = new Date(); return new Date(d - d.getTimezoneOffset()*6e4).toISOString().slice(0,10); })();
+const nowHour = new Date().getHours();
+const isWeekend = day => day.wd === "сб" || day.wd === "вс" || HOLIDAYS.includes(day.date);
+const price = (day, h) => isWeekend(day) ? 300 : h <= 15 ? 250 : h <= 19 ? 350 : 300;
+const fmtDate = iso => { const [y,m,d] = iso.split("-"); return `${+d} ${MONTHS[m-1]}`; };
+const hh = h => `${h}:00`;
+const roomName = r => /^\d/.test(r) ? `каб. ${r.replace(" Детский"," (детский)")}` : r.toLowerCase();
+const isPast = (day, h) => day.date < todayISO || (day.date === todayISO && h <= nowHour);
+const freeCount = day => Object.values(day.busy).flat().filter((v,i)=>v===0).length;
+
+function toast(t){ const el=$("#toast"); el.textContent=t; el.classList.add("on"); setTimeout(()=>el.classList.remove("on"),1800); }
+
+async function load(){
+  DATA = await (await fetch("data.json?"+Date.now())).json();
+  $("#upd").textContent = "Обновлено: " + DATA.updated;
+  const firstFuture = DATA.days.find(d => d.date >= todayISO) || DATA.days[0];
+  cur = firstFuture.date;
+  renderDays(); renderGrid(); initFind();
+}
+
+function renderDays(){
+  $("#days").innerHTML = DATA.days.map(d => {
+    const [,,dd] = d.date.split("-");
+    const n = DATA.hours.filter(h => !isPast(d,h)).reduce((s,h,_)=> s + d.rooms.filter(r => d.busy[r][DATA.hours.indexOf(h)]===0).length, 0);
+    return `<button class="day ${isWeekend(d)?'we':''} ${d.date===cur?'on':''} ${d.date<todayISO?'past':''}" data-d="${d.date}">
+      <small>${d.wd}</small><b>${+dd}</b><i>${d.date<todayISO?'':n+' св.'}</i></button>`;
+  }).join("");
+  $("#days").querySelectorAll(".day").forEach(b => b.onclick = () => { cur = b.dataset.d; clearSel(); renderDays(); renderGrid(); });
+  const on = $("#days .on"); on && on.scrollIntoView({inline:"center",block:"nearest"});
+}
+
+function renderGrid(){
+  const day = DATA.days.find(d => d.date === cur);
+  $("#dtitle").textContent = `${day.wd}, ${fmtDate(day.date)}` + (isWeekend(day) ? " · выходной тариф" : "");
+  const a = ADMINS[day.wd];
+  $("#dadmin").textContent = "Бронь у: " + a.name;
+  let html = "<tr><th></th>" + day.rooms.map(r => `<th class="room">${r.replace(" Детский","<br><small>детский</small>")}</th>`).join("") + "</tr>";
+  DATA.hours.forEach((h,hi) => {
+    html += `<tr><td class="h">${hh(h)}</td>`;
+    day.rooms.forEach(r => {
+      const v = day.busy[r][hi];
+      const past = isPast(day,h);
+      const s = sel && sel.date===day.date && sel.room===r && sel.hours.includes(h);
+      const cls = past ? "past" : v===1 ? "busy" : v===0.5 ? "half" : v===-0.5 ? "halfb" : "free";
+      const lab = past || v===1 ? "" : v===0.5 ? "с :30" : v===-0.5 ? "до :30" : price(day,h)+" ₽";
+      html += `<td class="c ${cls} ${s?'sel':''}" data-r="${r}" data-h="${h}">${lab}</td>`;
+    });
+    html += "</tr>";
+  });
+  $("#grid").innerHTML = html;
+  $("#grid").querySelectorAll("td.c").forEach(td => td.onclick = () => pick(day, td.dataset.r, +td.dataset.h, td));
+}
+
+function pick(day, room, h, td){
+  if (td.classList.contains("busy") || td.classList.contains("past")) return;
+  if (!sel || sel.date!==day.date || sel.room!==room) sel = {date:day.date, room, hours:[h]};
+  else if (sel.hours.includes(h)) {
+    // снять с краю
+    const mn=Math.min(...sel.hours), mx=Math.max(...sel.hours);
+    if (h===mn || h===mx) sel.hours = sel.hours.filter(x=>x!==h); else sel.hours=[h];
+    if (!sel.hours.length) sel = null;
+  } else {
+    const mn=Math.min(...sel.hours,h), mx=Math.max(...sel.hours,h), range=[];
+    for (let x=mn;x<=mx;x++) range.push(x);
+    const ok = range.every(x => { const v=day.busy[room][DATA.hours.indexOf(x)]; return v!==1 && !isPast(day,x); });
+    sel.hours = ok ? range : [h];
+    if (!ok) toast("Между часами есть занятое время");
+  }
+  renderGrid(); renderBar();
+}
+
+function renderBar(){
+  if (!sel) { $("#bar").classList.remove("on"); return; }
+  const day = DATA.days.find(d=>d.date===sel.date);
+  const hs = [...sel.hours].sort((a,b)=>a-b), total = hs.reduce((s,h)=>s+price(day,h),0);
+  $("#bWhat").textContent = `${roomName(sel.room)} · ${day.wd}, ${fmtDate(day.date)}`;
+  $("#bMeta").textContent = `${hh(hs[0])}–${hh(hs[hs.length-1]+1)} · ${hs.length} ч · ${total} ₽`;
+  $("#bar").classList.add("on");
+}
+function clearSel(){ sel=null; renderBar(); }
+$("#bClear").onclick = () => { clearSel(); renderGrid(); };
+
+function buildMsg(){
+  const day = DATA.days.find(d=>d.date===sel.date);
+  const hs=[...sel.hours].sort((a,b)=>a-b), total=hs.reduce((s,h)=>s+price(day,h),0);
+  const name = $("#myName").value.trim();
+  const [y,m,d] = day.date.split("-");
+  return `Здравствуйте! Хочу забронировать ${roomName(sel.room)} на ${day.wd} ${d}.${m} с ${hh(hs[0])} до ${hh(hs[hs.length-1]+1)} (${hs.length} ч, ${total} ₽).` + (name ? `\n${name}` : "");
+}
+$("#bBook").onclick = () => {
+  const day = DATA.days.find(d=>d.date===sel.date), a = ADMINS[day.wd];
+  $("#myName").value = store.get("myName") || "";
+  $("#dlgTo").textContent = `Кому: ${a.name}` + (a.tg ? ` (@${a.tg})` : "");
+  $("#msg").value = buildMsg(); syncLinks();
+  $("#dlg").showModal();
+};
+$("#myName").oninput = () => { store.set("myName", $("#myName").value); $("#msg").value = buildMsg(); syncLinks(); };
+$("#msg").oninput = syncLinks;
+function syncLinks(){
+  const day = DATA.days.find(d=>d.date===sel.date), a = ADMINS[day.wd], t = encodeURIComponent($("#msg").value);
+  $("#dTg").href = a.tg ? `https://t.me/${a.tg}?text=${t}` : `https://t.me/share/url?url=%20&text=${t}`;
+  $("#dWa").href = a.wa ? `https://wa.me/${a.wa}?text=${t}` : `https://wa.me/?text=${t}`;
+}
+$("#dCopy").onclick = async () => { try{ await navigator.clipboard.writeText($("#msg").value); toast("Скопировано"); }catch(e){ $("#msg").select(); document.execCommand("copy"); toast("Скопировано"); } };
+$("#dClose").onclick = () => $("#dlg").close();
+
+/* Поиск окна */
+function initFind(){
+  const opt = (v,t,s) => `<option value="${v}" ${s?'selected':''}>${t}</option>`;
+  $("#fDay").innerHTML = opt("any","ближайшие дни",1) + DATA.days.filter(d=>d.date>=todayISO).map(d=>opt(d.date,`${d.wd}, ${fmtDate(d.date)}`)).join("");
+  $("#fFrom").innerHTML = DATA.hours.map(h=>opt(h,hh(h),h===9)).join("");
+  $("#fTo").innerHTML = DATA.hours.map(h=>opt(h+1,hh(h+1),h===21)).join("");
+  $("#fRoom").innerHTML = opt("any","любой",1) + DATA.days[0].rooms.map(r=>opt(r,roomName(r))).join("");
+  ["#fDay","#fFrom","#fTo","#fLen","#fRoom","#fWd"].forEach(s => $(s).onchange = find);
+  find();
+}
+function find(){
+  const fd=$("#fDay").value, from=+$("#fFrom").value, to=+$("#fTo").value, len=+$("#fLen").value, fr=$("#fRoom").value, wd=$("#fWd").value;
+  const out=[];
+  for (const day of DATA.days){
+    if (day.date<todayISO || (fd!=="any" && day.date!==fd)) continue;
+    if (wd==="wk" && isWeekend(day)) continue;
+    if (wd==="we" && !isWeekend(day)) continue;
+    for (const r of day.rooms){
+      if (fr!=="any" && r!==fr) continue;
+      for (let s=from; s+len<=to; s++){
+        const hs=[...Array(len)].map((_,i)=>s+i);
+        if (hs.every(h => DATA.hours.includes(h) && !isPast(day,h) && day.busy[r][DATA.hours.indexOf(h)]===0)){
+          out.push({day,r,hs});
+        }
+      }
+    }
+    if (out.length>=60) break;
+  }
+  out.sort((a,b) => a.day.date.localeCompare(b.day.date) || a.hs[0]-b.hs[0]);
+  $("#res").innerHTML = out.length ? out.slice(0,60).map((o,i)=>{
+    const total=o.hs.reduce((s,h)=>s+price(o.day,h),0);
+    return `<div class="slot"><div><b>${o.day.wd}, ${fmtDate(o.day.date)} · ${hh(o.hs[0])}–${hh(o.hs[o.hs.length-1]+1)}</b><div class="m">${roomName(o.r)} · ${total} ₽</div></div>
+      <button class="btn sm" data-i="${i}">Выбрать</button></div>`;
+  }).join("") : `<div class="empty">Под эти условия окон нет. Попробуй другой день или меньше часов.</div>`;
+  $("#res").querySelectorAll("button").forEach(b => b.onclick = () => {
+    const o = out[+b.dataset.i];
+    sel = {date:o.day.date, room:o.r, hours:o.hs}; cur = o.day.date;
+    switchView("day"); renderDays(); renderGrid(); renderBar();
+  });
+}
+
+function switchView(v){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on", t.dataset.v===v));
+  $("#v-day").hidden = v!=="day"; $("#v-find").hidden = v!=="find";
+}
+document.querySelectorAll(".tab").forEach(t => t.onclick = () => switchView(t.dataset.v));
+
+load().catch(e => { $("#upd").textContent = "Не удалось загрузить данные: " + e.message; });
+</script>
+</body>
+</html>
